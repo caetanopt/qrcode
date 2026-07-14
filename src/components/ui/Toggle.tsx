@@ -30,10 +30,8 @@ export function Toggle({ checked, onChange, label, hideLabel, disabled }: Toggle
         )}
       >
         <span
-          className={cn(
-            "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform",
-            checked ? "translate-x-5" : "translate-x-0.5",
-          )}
+          className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-[left]"
+          style={{ left: checked ? "22px" : "2px" }}
           aria-hidden="true"
         />
       </button>
