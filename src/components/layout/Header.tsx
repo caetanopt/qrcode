@@ -11,7 +11,8 @@ export function Header() {
         >
           <CaetanoLogo className="h-6 w-auto" />
           <span className="sr-only">Caetano</span>
-          <span className="text-sm font-medium text-cinza-antracite-200">QR</span>
+          <span className="text-cinza-medio-100" aria-hidden="true">|</span>
+          <span className="text-xl font-semibold text-azul-cyan">QR</span>
         </Link>
       </div>
     </header>
