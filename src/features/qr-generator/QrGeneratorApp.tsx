@@ -42,6 +42,11 @@ export function QrGeneratorApp() {
     setContentStatus("invalid");
   }, []);
 
+  const handleEmpty = useCallback(() => {
+    setEncodedValue(null);
+    setContentStatus("empty");
+  }, []);
+
   const handleDraftChange = useCallback(
     (payload: Record<string, unknown>) => {
       setDrafts((current) => ({ ...current, [type]: payload }));
@@ -75,6 +80,7 @@ export function QrGeneratorApp() {
             initialValues={drafts[type]}
             onValidChange={handleValidChange}
             onInvalid={handleInvalid}
+            onEmpty={handleEmpty}
             onDraftChange={handleDraftChange}
           />
         </section>

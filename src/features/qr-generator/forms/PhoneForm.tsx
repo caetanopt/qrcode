@@ -10,28 +10,33 @@ interface PhoneFormProps {
   initialValues?: Partial<PhonePayload>;
   onValidChange: (payload: PhonePayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Partial<PhonePayload>) => void;
 }
 
-export function PhoneForm({ initialValues, onValidChange, onInvalid, onDraftChange }: PhoneFormProps) {
+const BLANK: PhonePayload = { phone: "" };
+
+export function PhoneForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: PhoneFormProps) {
   const t = useTranslations();
-  const { register, formState } = useLiveForm<PhonePayload>({
+  const { register, formState, isBlank } = useLiveForm<PhonePayload>({
     schema: phoneSchema,
-    defaultValues: { phone: "", ...initialValues },
+    defaultValues: { ...BLANK, ...initialValues },
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange,
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (
-    <FormField label={t.form.phone.label} required error={formState.errors.phone && t.form.phone.error}>
+    <FormField label={t.form.phone.label} required error={!isBlank && formState.errors.phone ? t.form.phone.error : undefined}>
       {({ inputId, describedBy }) => (
         <Input
           id={inputId}
           type="tel"
           aria-describedby={describedBy}
-          invalid={Boolean(formState.errors.phone)}
+          invalid={!isBlank && Boolean(formState.errors.phone)}
           placeholder={t.form.phone.placeholder}
           {...register("phone")}
         />

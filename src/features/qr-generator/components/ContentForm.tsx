@@ -17,10 +17,11 @@ interface ContentFormProps {
   initialValues: Record<string, unknown> | undefined;
   onValidChange: (payload: Record<string, unknown>) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Record<string, unknown>) => void;
 }
 
-export function ContentForm({ type, initialValues, onValidChange, onInvalid, onDraftChange }: ContentFormProps) {
+export function ContentForm({ type, initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: ContentFormProps) {
   switch (type) {
     case "url":
       return (
@@ -28,6 +29,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -37,6 +39,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -46,6 +49,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -55,6 +59,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -64,6 +69,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -73,6 +79,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -82,6 +89,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -91,6 +99,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -100,6 +109,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );
@@ -109,6 +119,7 @@ export function ContentForm({ type, initialValues, onValidChange, onInvalid, onD
           initialValues={initialValues}
           onValidChange={onValidChange}
           onInvalid={onInvalid}
+          onEmpty={onEmpty}
           onDraftChange={onDraftChange}
         />
       );

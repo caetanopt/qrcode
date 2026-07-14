@@ -14,20 +14,24 @@ interface WifiFormProps {
   initialValues?: Partial<WifiPayload>;
   onValidChange: (payload: WifiPayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   /** Never receives the password — Wi-Fi passwords are never kept when switching QR type. */
   onDraftChange: (payload: Partial<Omit<WifiPayload, "password">>) => void;
 }
 
 const SECURITY_VALUES: WifiPayload["security"][] = ["WPA2", "WPA3", "WPA", "WEP", "nopass"];
+const BLANK: WifiPayload = { ssid: "", password: "", security: "WPA2", hidden: false };
 
-export function WifiForm({ initialValues, onValidChange, onInvalid, onDraftChange }: WifiFormProps) {
+export function WifiForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: WifiFormProps) {
   const t = useTranslations();
   const [showPassword, setShowPassword] = useState(false);
-  const { register, watch, setValue, formState } = useLiveForm<WifiPayload>({
+  const { register, watch, setValue, formState, isBlank } = useLiveForm<WifiPayload>({
     schema: wifiSchema,
-    defaultValues: { ssid: "", password: "", security: "WPA2", hidden: false, ...initialValues },
+    defaultValues: { ...BLANK, ...initialValues },
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange: ({ password: _password, ...rest }) => onDraftChange(rest),
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
@@ -37,12 +41,12 @@ export function WifiForm({ initialValues, onValidChange, onInvalid, onDraftChang
 
   return (
     <div className="flex flex-col gap-4">
-      <FormField label={t.form.wifi.ssid} required error={formState.errors.ssid && t.form.wifi.error}>
+      <FormField label={t.form.wifi.ssid} required error={!isBlank && formState.errors.ssid ? t.form.wifi.error : undefined}>
         {({ inputId, describedBy }) => (
           <Input
             id={inputId}
             aria-describedby={describedBy}
-            invalid={Boolean(formState.errors.ssid)}
+            invalid={!isBlank && Boolean(formState.errors.ssid)}
             // deps: the password error comes from a whole-schema rule, so it
             // must be re-evaluated when the sibling fields change too.
             {...register("ssid", { deps: ["password"] })}
@@ -68,7 +72,7 @@ export function WifiForm({ initialValues, onValidChange, onInvalid, onDraftChang
         <FormField
           label={t.form.wifi.password}
           required
-          error={formState.errors.password && t.form.wifi.passwordRequired}
+          error={!isBlank && formState.errors.password ? t.form.wifi.passwordRequired : undefined}
         >
           {({ inputId, describedBy }) => (
             <div className="flex gap-2">
@@ -76,7 +80,7 @@ export function WifiForm({ initialValues, onValidChange, onInvalid, onDraftChang
                 id={inputId}
                 type={showPassword ? "text" : "password"}
                 aria-describedby={describedBy}
-                invalid={Boolean(formState.errors.password)}
+                invalid={!isBlank && Boolean(formState.errors.password)}
                 {...register("password")}
               />
               <Button

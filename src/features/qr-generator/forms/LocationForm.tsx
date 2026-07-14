@@ -11,24 +11,24 @@ interface LocationFormProps {
   initialValues?: Partial<LocationPayload>;
   onValidChange: (payload: LocationPayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Partial<LocationPayload>) => void;
 }
 
-export function LocationForm({ initialValues, onValidChange, onInvalid, onDraftChange }: LocationFormProps) {
+// Coordinates start blank on purpose (never a silent 0,0). The inputs yield
+// strings at runtime and the schema coerces them, so "" is the honest blank
+// value even though the payload type says number.
+const BLANK = { latitude: "", longitude: "", description: "" } as unknown as LocationPayload;
+
+export function LocationForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: LocationFormProps) {
   const t = useTranslations();
-  const { register, formState } = useLiveForm<LocationPayload>({
+  const { register, formState, isBlank } = useLiveForm<LocationPayload>({
     schema: locationSchema,
-    // Coordinates start blank on purpose (never a silent 0,0). The inputs
-    // yield strings at runtime and the schema coerces them, so "" is the
-    // honest default even though the payload type says number.
-    defaultValues: {
-      latitude: "",
-      longitude: "",
-      description: "",
-      ...initialValues,
-    } as unknown as DefaultValues<LocationPayload>,
+    defaultValues: { ...BLANK, ...initialValues } as unknown as DefaultValues<LocationPayload>,
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange,
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
@@ -36,26 +36,34 @@ export function LocationForm({ initialValues, onValidChange, onInvalid, onDraftC
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4">
-        <FormField label={t.form.location.latitude} required error={formState.errors.latitude && t.form.location.error}>
+        <FormField
+          label={t.form.location.latitude}
+          required
+          error={!isBlank && formState.errors.latitude ? t.form.location.error : undefined}
+        >
           {({ inputId, describedBy }) => (
             <Input
               id={inputId}
               type="number"
               step="any"
               aria-describedby={describedBy}
-              invalid={Boolean(formState.errors.latitude)}
+              invalid={!isBlank && Boolean(formState.errors.latitude)}
               {...register("latitude")}
             />
           )}
         </FormField>
-        <FormField label={t.form.location.longitude} required error={formState.errors.longitude && t.form.location.error}>
+        <FormField
+          label={t.form.location.longitude}
+          required
+          error={!isBlank && formState.errors.longitude ? t.form.location.error : undefined}
+        >
           {({ inputId, describedBy }) => (
             <Input
               id={inputId}
               type="number"
               step="any"
               aria-describedby={describedBy}
-              invalid={Boolean(formState.errors.longitude)}
+              invalid={!isBlank && Boolean(formState.errors.longitude)}
               {...register("longitude")}
             />
           )}

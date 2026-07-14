@@ -11,29 +11,33 @@ interface EventFormProps {
   initialValues?: Partial<EventPayload>;
   onValidChange: (payload: EventPayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Partial<EventPayload>) => void;
 }
 
-export function EventForm({ initialValues, onValidChange, onInvalid, onDraftChange }: EventFormProps) {
+const BLANK: EventPayload = {
+  title: "",
+  location: "",
+  start: "",
+  end: "",
+  description: "",
+  timezone: "Europe/Lisbon",
+};
+
+export function EventForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: EventFormProps) {
   const t = useTranslations();
-  const { register, formState } = useLiveForm<EventPayload>({
+  const { register, formState, isBlank } = useLiveForm<EventPayload>({
     schema: eventSchema,
-    defaultValues: {
-      title: "",
-      location: "",
-      start: "",
-      end: "",
-      description: "",
-      timezone: "Europe/Lisbon",
-      ...initialValues,
-    },
+    defaultValues: { ...BLANK, ...initialValues },
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange,
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
-  const endError = formState.errors.end
+  const endError = !isBlank && formState.errors.end
     ? formState.errors.end.message === "errorEndBeforeStart"
       ? t.form.event.errorEndBeforeStart
       : t.form.event.errorRequired
@@ -41,12 +45,16 @@ export function EventForm({ initialValues, onValidChange, onInvalid, onDraftChan
 
   return (
     <div className="flex flex-col gap-4">
-      <FormField label={t.form.event.title} required error={formState.errors.title && t.form.event.errorRequired}>
+      <FormField
+        label={t.form.event.title}
+        required
+        error={!isBlank && formState.errors.title ? t.form.event.errorRequired : undefined}
+      >
         {({ inputId, describedBy }) => (
           <Input
             id={inputId}
             aria-describedby={describedBy}
-            invalid={Boolean(formState.errors.title)}
+            invalid={!isBlank && Boolean(formState.errors.title)}
             {...register("title")}
           />
         )}
@@ -55,13 +63,17 @@ export function EventForm({ initialValues, onValidChange, onInvalid, onDraftChan
         {({ inputId }) => <Input id={inputId} {...register("location")} />}
       </FormField>
       <div className="grid grid-cols-2 gap-4">
-        <FormField label={t.form.event.start} required error={formState.errors.start && t.form.event.errorRequired}>
+        <FormField
+          label={t.form.event.start}
+          required
+          error={!isBlank && formState.errors.start ? t.form.event.errorRequired : undefined}
+        >
           {({ inputId, describedBy }) => (
             <Input
               id={inputId}
               type="datetime-local"
               aria-describedby={describedBy}
-              invalid={Boolean(formState.errors.start)}
+              invalid={!isBlank && Boolean(formState.errors.start)}
               // deps: "end before start" lives on the end field, so changing
               // the start date must re-evaluate it too.
               {...register("start", { deps: ["end"] })}
@@ -74,7 +86,7 @@ export function EventForm({ initialValues, onValidChange, onInvalid, onDraftChan
               id={inputId}
               type="datetime-local"
               aria-describedby={describedBy}
-              invalid={Boolean(formState.errors.end)}
+              invalid={!isBlank && Boolean(formState.errors.end)}
               {...register("end")}
             />
           )}

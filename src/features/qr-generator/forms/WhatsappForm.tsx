@@ -11,16 +11,21 @@ interface WhatsappFormProps {
   initialValues?: Partial<WhatsappPayload>;
   onValidChange: (payload: WhatsappPayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Partial<WhatsappPayload>) => void;
 }
 
-export function WhatsappForm({ initialValues, onValidChange, onInvalid, onDraftChange }: WhatsappFormProps) {
+const BLANK: WhatsappPayload = { countryCode: "+351", phone: "", message: "" };
+
+export function WhatsappForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: WhatsappFormProps) {
   const t = useTranslations();
-  const { register, formState } = useLiveForm<WhatsappPayload>({
+  const { register, formState, isBlank } = useLiveForm<WhatsappPayload>({
     schema: whatsappSchema,
-    defaultValues: { countryCode: "+351", phone: "", message: "", ...initialValues },
+    defaultValues: { ...BLANK, ...initialValues },
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange,
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
@@ -31,24 +36,28 @@ export function WhatsappForm({ initialValues, onValidChange, onInvalid, onDraftC
         <FormField
           label={t.form.whatsapp.countryCode}
           required
-          error={formState.errors.countryCode && t.form.whatsapp.error}
+          error={!isBlank && formState.errors.countryCode ? t.form.whatsapp.error : undefined}
         >
           {({ inputId, describedBy }) => (
             <Input
               id={inputId}
               aria-describedby={describedBy}
-              invalid={Boolean(formState.errors.countryCode)}
+              invalid={!isBlank && Boolean(formState.errors.countryCode)}
               {...register("countryCode")}
             />
           )}
         </FormField>
-        <FormField label={t.form.whatsapp.phone} required error={formState.errors.phone && t.form.whatsapp.error}>
+        <FormField
+          label={t.form.whatsapp.phone}
+          required
+          error={!isBlank && formState.errors.phone ? t.form.whatsapp.error : undefined}
+        >
           {({ inputId, describedBy }) => (
             <Input
               id={inputId}
               type="tel"
               aria-describedby={describedBy}
-              invalid={Boolean(formState.errors.phone)}
+              invalid={!isBlank && Boolean(formState.errors.phone)}
               {...register("phone")}
             />
           )}

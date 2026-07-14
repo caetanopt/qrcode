@@ -15,8 +15,12 @@ interface UseLiveFormArgs<TValues extends FieldValues> {
   // runtime is unaffected.
   schema: ZodType<TValues, ZodTypeDef, unknown>;
   defaultValues: DefaultValues<TValues>;
+  /** The form's truly-blank shape (before any restored draft is merged in) — used to tell "cleared back to nothing" apart from "typed something invalid". */
+  blankValues: TValues;
   onValidChange: (value: TValues) => void;
   onInvalid?: () => void;
+  /** Called when the form is blank again (e.g. content was typed then deleted) — distinct from a pristine, never-touched form, which reports neither. */
+  onEmpty?: () => void;
   /** Fired on every keystroke, valid or not, so the draft can be kept when switching QR type. */
   onDraftChange?: (value: TValues) => void;
   /**
@@ -31,8 +35,10 @@ interface UseLiveFormArgs<TValues extends FieldValues> {
 export function useLiveForm<TValues extends FieldValues>({
   schema,
   defaultValues,
+  blankValues,
   onValidChange,
   onInvalid,
+  onEmpty,
   onDraftChange,
   startDirty = false,
 }: UseLiveFormArgs<TValues>) {
@@ -48,10 +54,16 @@ export function useLiveForm<TValues extends FieldValues>({
   const isValid = formState.isValid;
   const isDirty = formState.isDirty;
 
+  const isBlank = JSON.stringify(values) === JSON.stringify(blankValues);
+
   useEffect(() => {
     const parsed = schema.safeParse(values);
     if (parsed.success) {
       onValidChange(parsed.data);
+    } else if (isBlank) {
+      // Cleared back to nothing (e.g. typed then deleted) — that's the empty
+      // state, not an error, regardless of whether the field was touched.
+      onEmpty?.();
     }
     if (isDirty || startDirty) {
       // Only persist a draft (and report invalid content) once the user has
@@ -59,12 +71,12 @@ export function useLiveForm<TValues extends FieldValues>({
       // draft — a pristine, still-blank form isn't an error and shouldn't
       // overwrite the saved draft with blank values.
       onDraftChange?.(values);
-      if (!parsed.success) {
+      if (!parsed.success && !isBlank) {
         onInvalid?.();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(values), isValid, isDirty, startDirty]);
+  }, [JSON.stringify(values), isValid, isDirty, startDirty, isBlank]);
 
-  return form;
+  return { ...form, isBlank };
 }

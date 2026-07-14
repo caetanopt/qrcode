@@ -11,29 +11,34 @@ interface SmsFormProps {
   initialValues?: Partial<SmsPayload>;
   onValidChange: (payload: SmsPayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Partial<SmsPayload>) => void;
 }
 
-export function SmsForm({ initialValues, onValidChange, onInvalid, onDraftChange }: SmsFormProps) {
+const BLANK: SmsPayload = { phone: "", message: "" };
+
+export function SmsForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: SmsFormProps) {
   const t = useTranslations();
-  const { register, formState } = useLiveForm<SmsPayload>({
+  const { register, formState, isBlank } = useLiveForm<SmsPayload>({
     schema: smsSchema,
-    defaultValues: { phone: "", message: "", ...initialValues },
+    defaultValues: { ...BLANK, ...initialValues },
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange,
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (
     <div className="flex flex-col gap-4">
-      <FormField label={t.form.sms.phone} required error={formState.errors.phone && t.form.sms.error}>
+      <FormField label={t.form.sms.phone} required error={!isBlank && formState.errors.phone ? t.form.sms.error : undefined}>
         {({ inputId, describedBy }) => (
           <Input
             id={inputId}
             type="tel"
             aria-describedby={describedBy}
-            invalid={Boolean(formState.errors.phone)}
+            invalid={!isBlank && Boolean(formState.errors.phone)}
             {...register("phone")}
           />
         )}

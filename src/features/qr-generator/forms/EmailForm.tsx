@@ -11,29 +11,34 @@ interface EmailFormProps {
   initialValues?: Partial<EmailPayload>;
   onValidChange: (payload: EmailPayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Partial<EmailPayload>) => void;
 }
 
-export function EmailForm({ initialValues, onValidChange, onInvalid, onDraftChange }: EmailFormProps) {
+const BLANK: EmailPayload = { address: "", subject: "", body: "" };
+
+export function EmailForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: EmailFormProps) {
   const t = useTranslations();
-  const { register, formState } = useLiveForm<EmailPayload>({
+  const { register, formState, isBlank } = useLiveForm<EmailPayload>({
     schema: emailSchema,
-    defaultValues: { address: "", subject: "", body: "", ...initialValues },
+    defaultValues: { ...BLANK, ...initialValues },
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange,
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (
     <div className="flex flex-col gap-4">
-      <FormField label={t.form.email.address} required error={formState.errors.address && t.form.email.error}>
+      <FormField label={t.form.email.address} required error={!isBlank && formState.errors.address ? t.form.email.error : undefined}>
         {({ inputId, describedBy }) => (
           <Input
             id={inputId}
             type="email"
             aria-describedby={describedBy}
-            invalid={Boolean(formState.errors.address)}
+            invalid={!isBlank && Boolean(formState.errors.address)}
             {...register("address")}
           />
         )}

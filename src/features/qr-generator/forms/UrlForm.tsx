@@ -10,28 +10,33 @@ interface UrlFormProps {
   initialValues?: Partial<UrlPayload>;
   onValidChange: (payload: UrlPayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Partial<UrlPayload>) => void;
 }
 
-export function UrlForm({ initialValues, onValidChange, onInvalid, onDraftChange }: UrlFormProps) {
+const BLANK: UrlPayload = { url: "", title: "" };
+
+export function UrlForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: UrlFormProps) {
   const t = useTranslations();
-  const { register, formState } = useLiveForm<UrlPayload>({
+  const { register, formState, isBlank } = useLiveForm<UrlPayload>({
     schema: urlSchema,
-    defaultValues: { url: "", title: "", ...initialValues },
+    defaultValues: { ...BLANK, ...initialValues },
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange,
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (
     <div className="flex flex-col gap-4">
-      <FormField label={t.form.url.label} required error={formState.errors.url && t.form.url.error}>
+      <FormField label={t.form.url.label} required error={!isBlank && formState.errors.url ? t.form.url.error : undefined}>
         {({ inputId, describedBy }) => (
           <Input
             id={inputId}
             aria-describedby={describedBy}
-            invalid={Boolean(formState.errors.url)}
+            invalid={!isBlank && Boolean(formState.errors.url)}
             placeholder={t.form.url.placeholder}
             {...register("url")}
           />

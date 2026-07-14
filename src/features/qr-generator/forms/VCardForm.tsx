@@ -11,27 +11,31 @@ interface VCardFormProps {
   initialValues?: Partial<VCardPayload>;
   onValidChange: (payload: VCardPayload) => void;
   onInvalid: () => void;
+  onEmpty: () => void;
   onDraftChange: (payload: Partial<VCardPayload>) => void;
 }
 
-export function VCardForm({ initialValues, onValidChange, onInvalid, onDraftChange }: VCardFormProps) {
+const BLANK: VCardPayload = {
+  firstName: "",
+  lastName: "",
+  organization: "",
+  role: "",
+  phone: "",
+  email: "",
+  website: "",
+  address: "",
+  notes: "",
+};
+
+export function VCardForm({ initialValues, onValidChange, onInvalid, onEmpty, onDraftChange }: VCardFormProps) {
   const t = useTranslations();
-  const { register, formState } = useLiveForm<VCardPayload>({
+  const { register, formState, isBlank } = useLiveForm<VCardPayload>({
     schema: vcardSchema,
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      organization: "",
-      role: "",
-      phone: "",
-      email: "",
-      website: "",
-      address: "",
-      notes: "",
-      ...initialValues,
-    },
+    defaultValues: { ...BLANK, ...initialValues },
+    blankValues: BLANK,
     onValidChange,
     onInvalid,
+    onEmpty,
     onDraftChange,
     startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
@@ -39,12 +43,16 @@ export function VCardForm({ initialValues, onValidChange, onInvalid, onDraftChan
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4">
-        <FormField label={t.form.vcard.firstName} required error={formState.errors.firstName && t.form.vcard.error}>
+        <FormField
+          label={t.form.vcard.firstName}
+          required
+          error={!isBlank && formState.errors.firstName ? t.form.vcard.error : undefined}
+        >
           {({ inputId, describedBy }) => (
             <Input
               id={inputId}
               aria-describedby={describedBy}
-              invalid={Boolean(formState.errors.firstName)}
+              invalid={!isBlank && Boolean(formState.errors.firstName)}
               {...register("firstName")}
             />
           )}
@@ -65,7 +73,10 @@ export function VCardForm({ initialValues, onValidChange, onInvalid, onDraftChan
         <FormField label={t.form.vcard.phone} hint={t.common.optional}>
           {({ inputId }) => <Input id={inputId} type="tel" {...register("phone")} />}
         </FormField>
-        <FormField label={t.form.vcard.email} error={formState.errors.email?.message ? t.form.email.error : undefined}>
+        <FormField
+          label={t.form.vcard.email}
+          error={!isBlank && formState.errors.email?.message ? t.form.email.error : undefined}
+        >
           {({ inputId, describedBy }) => (
             <Input id={inputId} type="email" aria-describedby={describedBy} {...register("email")} />
           )}

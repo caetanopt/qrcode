@@ -90,4 +90,23 @@ test.describe("Gerador de QR Code", () => {
     await page.getByRole("textbox", { name: "Palavra-passe" }).fill("segredo123");
     await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas:visible")).toBeVisible();
   });
+
+  test("volta ao estado vazio (sem erro, no campo nem na pré-visualização) ao limpar um campo obrigatório", async ({ page }) => {
+    await page.goto("/");
+    const urlInput = page.getByLabel("URL de destino");
+
+    await urlInput.fill("https://caetano.pt");
+    await urlInput.fill("");
+    await expect(page.getByText("Introduza um endereço válido")).not.toBeVisible();
+    await expect(page.getByText("Corrija os erros no formulário")).not.toBeVisible();
+    await expect(page.getByText("Preencha o formulário para gerar o seu QR Code")).toBeVisible();
+
+    // Genuinely invalid (non-empty) content must still show as an error.
+    await urlInput.fill("ftp://exemplo.pt");
+    await expect(page.getByText("Introduza um endereço válido")).toBeVisible();
+
+    await urlInput.fill("");
+    await expect(page.getByText("Introduza um endereço válido")).not.toBeVisible();
+    await expect(page.getByText("Preencha o formulário para gerar o seu QR Code")).toBeVisible();
+  });
 });
