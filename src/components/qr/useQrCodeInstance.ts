@@ -5,7 +5,7 @@ import type QRCodeStyling from "qr-code-styling";
 import type { Options } from "qr-code-styling";
 
 interface UseQrCodeInstanceResult {
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   instance: QRCodeStyling | null;
   ready: boolean;
 }
@@ -14,14 +14,15 @@ export function useQrCodeInstance(options: Options | null): UseQrCodeInstanceRes
   const containerRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<QRCodeStyling | null>(null);
   const [instance, setInstance] = useState<QRCodeStyling | null>(null);
-  const [ready, setReady] = useState(false);
+  // Whether the async draw for the current `options` has completed. Combined
+  // with `Boolean(options)` below rather than reset from inside the effect,
+  // so a null `options` clears readiness immediately instead of through an
+  // extra synchronous setState-in-effect render pass.
+  const [drawn, setDrawn] = useState(false);
 
   useEffect(() => {
+    if (!options) return;
     let cancelled = false;
-    if (!options) {
-      setReady(false);
-      return;
-    }
 
     import("qr-code-styling").then(({ default: QRCodeStyling }) => {
       if (cancelled) return;
@@ -35,7 +36,7 @@ export function useQrCodeInstance(options: Options | null): UseQrCodeInstanceRes
       } else {
         instanceRef.current.update(options);
       }
-      setReady(true);
+      setDrawn(true);
     });
 
     return () => {
@@ -44,5 +45,5 @@ export function useQrCodeInstance(options: Options | null): UseQrCodeInstanceRes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(options)]);
 
-  return { containerRef, instance, ready };
+  return { containerRef, instance, ready: Boolean(options) && drawn };
 }

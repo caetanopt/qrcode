@@ -1,11 +1,18 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type DefaultValues, type FieldValues } from "react-hook-form";
+import { useForm, type DefaultValues, type FieldValues, type Resolver } from "react-hook-form";
 import type { ZodType, ZodTypeDef } from "zod";
 import { useEffect } from "react";
 
 interface UseLiveFormArgs<TValues extends FieldValues> {
+  // Input differs from Output for schemas with optional/defaulted fields
+  // (e.g. subject?: string defaulting to "") or preprocessed fields (e.g.
+  // coordinates accepting unknown before coercion), which @hookform/resolvers'
+  // stricter v5 typings can't express in a single TValues generic here
+  // without reshaping every form's register()/watch() types. The resolver
+  // cast below is the one place that absorbs that mismatch; behavior at
+  // runtime is unaffected.
   schema: ZodType<TValues, ZodTypeDef, unknown>;
   defaultValues: DefaultValues<TValues>;
   onValidChange: (value: TValues) => void;
@@ -29,8 +36,9 @@ export function useLiveForm<TValues extends FieldValues>({
   onDraftChange,
   startDirty = false,
 }: UseLiveFormArgs<TValues>) {
+  const resolver = zodResolver(schema as never) as unknown as Resolver<TValues, unknown, TValues>;
   const form = useForm<TValues>({
-    resolver: zodResolver(schema),
+    resolver,
     defaultValues,
     mode: "onChange",
   });

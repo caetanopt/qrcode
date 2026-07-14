@@ -27,6 +27,10 @@ export function useLocalStorageState<T>(key: string, initialValue: T) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    // Re-reads localStorage once mounted on the client: the lazy initializer
+    // above always returns `initialValue` during SSR (no `window`), so this
+    // is the one-time client/server hydration sync, not a cascading update.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setValue(readFromStorage(key, initialValue));
     setHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
