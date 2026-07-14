@@ -14,14 +14,14 @@ import { cn } from "@/lib/utils/cn";
 
 interface QRPreviewProps {
   encodedValue: string | null;
-  isContentValid: boolean;
+  status: "empty" | "invalid" | "valid";
   design: QRCodeDesign;
 }
 
 const PREVIEW_SIZE = 280;
 const PRINT_TEST_SIZE_MM = 30;
 
-export function QRPreview({ encodedValue, isContentValid, design }: QRPreviewProps) {
+export function QRPreview({ encodedValue, status, design }: QRPreviewProps) {
   const t = useTranslations();
   const [printTest, setPrintTest] = useState(false);
   const debouncedValue = useDebouncedValue(encodedValue, 250);
@@ -34,7 +34,7 @@ export function QRPreview({ encodedValue, isContentValid, design }: QRPreviewPro
 
   const { containerRef, ready } = useQrCodeInstance(options);
   const contrastOk = hasSufficientContrast(design.foregroundColor, design.backgroundColor);
-  const showQr = isContentValid && Boolean(encodedValue);
+  const showQr = status === "valid" && Boolean(encodedValue);
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -54,12 +54,12 @@ export function QRPreview({ encodedValue, isContentValid, design }: QRPreviewPro
         {/* Kept mounted at all times so the QR instance always has a live container to attach to. */}
         <div ref={containerRef} className={cn(!showQr || !ready ? "invisible" : undefined, "absolute")} />
 
-        {!showQr && !isContentValid && (
+        {status === "invalid" && (
           <div className="absolute inset-0 flex items-center justify-center p-2">
             <ErrorState title={t.preview.invalid} />
           </div>
         )}
-        {!showQr && isContentValid && (
+        {status === "empty" && (
           <div className="absolute inset-0 flex items-center justify-center p-2">
             <EmptyState title={t.preview.empty} />
           </div>

@@ -18,7 +18,7 @@ export function QrGeneratorApp() {
   const [type, setType] = useLocalStorageState<QRCodeType>("caetano-qr:type", "url");
   const [design, setDesign, resetDesign] = useLocalStorageState("caetano-qr:design", DEFAULT_DESIGN);
   const [encodedValue, setEncodedValue] = useState<string | null>(null);
-  const [isContentValid, setIsContentValid] = useState(false);
+  const [contentStatus, setContentStatus] = useState<"empty" | "invalid" | "valid">("empty");
 
   const handleValidChange = useCallback(
     (payload: Record<string, unknown>) => {
@@ -27,23 +27,24 @@ export function QrGeneratorApp() {
         // TS can't correlate the union here, so the cast is intentional.
         const encoded = encodePayload(type, payload as never);
         setEncodedValue(encoded);
-        setIsContentValid(true);
+        setContentStatus("valid");
       } catch {
         setEncodedValue(null);
-        setIsContentValid(false);
+        setContentStatus("invalid");
       }
     },
     [type],
   );
 
   const handleInvalid = useCallback(() => {
-    setIsContentValid(false);
+    setEncodedValue(null);
+    setContentStatus("invalid");
   }, []);
 
   function handleTypeChange(nextType: QRCodeType) {
     setType(nextType);
     setEncodedValue(null);
-    setIsContentValid(false);
+    setContentStatus("empty");
   }
 
   return (
@@ -84,14 +85,14 @@ export function QrGeneratorApp() {
           <h2 id="preview-heading" className="mb-4 text-lg font-semibold text-cinza-antracite">
             {t.preview.title}
           </h2>
-          <QRPreview encodedValue={isContentValid ? encodedValue : null} isContentValid={isContentValid} design={design} />
+          <QRPreview encodedValue={encodedValue} status={contentStatus} design={design} />
         </section>
 
         <section aria-labelledby="download-heading" className="rounded-lg border border-cinza-medio-100 p-4 sm:p-6">
           <h2 id="download-heading" className="mb-4 text-lg font-semibold text-cinza-antracite">
             {t.download.title}
           </h2>
-          <DownloadOptions encodedValue={isContentValid ? encodedValue : null} design={design} />
+          <DownloadOptions encodedValue={contentStatus === "valid" ? encodedValue : null} design={design} />
         </section>
       </div>
     </div>

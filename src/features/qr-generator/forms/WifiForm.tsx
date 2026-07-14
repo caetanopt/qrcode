@@ -79,7 +79,7 @@ export function WifiForm({ onValidChange, onInvalid }: WifiFormProps) {
 
       <Toggle
         checked={hidden}
-        onChange={(value) => setValue("hidden", value, { shouldValidate: true })}
+        onChange={(value) => setValue("hidden", value, { shouldValidate: true, shouldDirty: true })}
         label={t.form.wifi.hidden}
       />
     </div>

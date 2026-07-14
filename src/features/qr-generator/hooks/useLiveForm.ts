@@ -27,16 +27,19 @@ export function useLiveForm<TValues extends FieldValues>({
   const { watch, formState } = form;
   const values = watch();
   const isValid = formState.isValid;
+  const isDirty = formState.isDirty;
 
   useEffect(() => {
     const parsed = schema.safeParse(values);
     if (parsed.success) {
       onValidChange(parsed.data);
-    } else {
+    } else if (isDirty) {
+      // Only report invalid once the user has actually touched the form —
+      // a pristine, still-empty form isn't an error, it just hasn't started.
       onInvalid?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(values), isValid]);
+  }, [JSON.stringify(values), isValid, isDirty]);
 
   return form;
 }
