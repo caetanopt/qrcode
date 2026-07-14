@@ -13,35 +13,7 @@ const ptPT = {
     back: "Voltar",
   },
   nav: {
-    home: "Início",
     generator: "Gerador de QR Code",
-  },
-  home: {
-    title: "Crie QR Codes personalizados em segundos",
-    subtitle:
-      "Gere, personalize e descarregue QR Codes profissionais para marketing, eventos, restauração, retalho e comunicação empresarial.",
-    cta: "Criar QR Code",
-    featuresTitle: "Tudo o que precisa para criar QR Codes profissionais",
-    features: {
-      types: {
-        title: "10 tipos de conteúdo",
-        description:
-          "URL, texto, e-mail, telefone, SMS, WhatsApp, Wi-Fi, contacto, localização e eventos.",
-      },
-      design: {
-        title: "Personalização visual",
-        description:
-          "Cores, gradientes, formas dos módulos, marcadores e logótipo, sem comprometer a leitura.",
-      },
-      preview: {
-        title: "Pré-visualização em tempo real",
-        description: "Veja o resultado instantaneamente enquanto personaliza.",
-      },
-      export: {
-        title: "Exportação profissional",
-        description: "PNG, SVG e JPEG em diferentes resoluções, prontos para digital e impressão.",
-      },
-    },
   },
   qrTypes: {
     url: "URL",

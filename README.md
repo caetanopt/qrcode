@@ -30,8 +30,7 @@ npm run build
 ```text
 src/
   app/                 # rotas (App Router)
-    page.tsx           # homepage pública (indexável)
-    gerador/page.tsx    # ferramenta de geração (noindex)
+    page.tsx           # página única: gerador de QR Code
   components/
     ui/                # design system (Button, Input, Tabs, ColorPicker, ...)
     qr/                 # QRPreview, DownloadOptions
@@ -67,8 +66,8 @@ e2e/                     # testes Playwright
 - Acessibilidade: navegação por teclado (incluindo roving tabindex no seletor de
   tipo e nos separadores), labels associados, mensagens de erro ligadas aos
   campos, `prefers-reduced-motion` respeitado.
-- SEO básico na homepage (metadata, Open Graph, Twitter Card, robots.txt,
-  sitemap); a página do gerador está marcada como `noindex`.
+- SEO básico (metadata, Open Graph, Twitter Card, robots.txt, sitemap) na
+  página única do gerador, que serve também de homepage pública.
 
 ## Decisões e simplificações conscientes
 

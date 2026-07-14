@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("Gerador de QR Code", () => {
   test("cria um QR Code de URL e permite exportar em PNG", async ({ page }) => {
-    await page.goto("/gerador");
+    await page.goto("/");
     await page.getByLabel("URL de destino").fill("https://caetano.pt");
     await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas")).toBeVisible();
 
@@ -13,14 +13,14 @@ test.describe("Gerador de QR Code", () => {
   });
 
   test("mostra erro de validação para um URL inválido", async ({ page }) => {
-    await page.goto("/gerador");
+    await page.goto("/");
     await page.getByLabel("URL de destino").fill("ftp://exemplo.pt");
     await page.getByLabel("URL de destino").blur();
     await expect(page.getByText("Introduza um endereço válido")).toBeVisible();
   });
 
   test("cria um QR Code de Wi-Fi com palavra-passe mascarada", async ({ page }) => {
-    await page.goto("/gerador");
+    await page.goto("/");
     await page.getByRole("radio", { name: /Wi-Fi/ }).click();
     await page.getByLabel("Nome da rede (SSID)").fill("Rede Caetano");
     const passwordInput = page.getByRole("textbox", { name: "Palavra-passe" });
@@ -30,7 +30,7 @@ test.describe("Gerador de QR Code", () => {
   });
 
   test("permite navegar pelo seletor de tipo apenas com o teclado", async ({ page }) => {
-    await page.goto("/gerador");
+    await page.goto("/");
     const urlOption = page.getByRole("radio", { name: /^URL/ });
     await urlOption.focus();
     await page.keyboard.press("ArrowRight");
@@ -39,7 +39,7 @@ test.describe("Gerador de QR Code", () => {
 
   test("funciona em viewport mobile", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/gerador");
+    await page.goto("/");
     await expect(page.getByRole("heading", { name: "Escolha o tipo de QR Code" })).toBeVisible();
   });
 });
