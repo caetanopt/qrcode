@@ -4,7 +4,7 @@ test.describe("Gerador de QR Code", () => {
   test("cria um QR Code de URL e permite exportar em PNG", async ({ page }) => {
     await page.goto("/");
     await page.getByLabel("URL de destino").fill("https://caetano.pt");
-    await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas")).toBeVisible();
+    await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas:visible")).toBeVisible();
 
     const downloadPromise = page.waitForEvent("download");
     await page.getByRole("button", { name: "Transferir" }).click();
@@ -26,7 +26,7 @@ test.describe("Gerador de QR Code", () => {
     const passwordInput = page.getByRole("textbox", { name: "Palavra-passe" });
     await passwordInput.fill("segredo123");
     await expect(passwordInput).toHaveAttribute("type", "password");
-    await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas")).toBeVisible();
+    await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas:visible")).toBeVisible();
   });
 
   test("permite navegar pelo seletor de tipo apenas com o teclado", async ({ page }) => {
@@ -66,5 +66,16 @@ test.describe("Gerador de QR Code", () => {
       await expect(page.getByText("Corrija os erros no formulário")).not.toBeVisible();
       await expect(page.getByText("Preencha o formulário para gerar o seu QR Code")).toBeVisible();
     }
+  });
+
+  test("mantém o QR fantasma visível ao voltar de um tipo sempre válido", async ({ page }) => {
+    await page.goto("/");
+    // Localização começa preenchida com coordenadas 0,0 válidas por defeito.
+    await page.getByRole("radio", { name: /^Localização/ }).click();
+    await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas:visible")).toBeVisible();
+
+    await page.getByRole("radio", { name: /^URL/ }).click();
+    await expect(page.getByText("Preencha o formulário para gerar o seu QR Code")).toBeVisible();
+    await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas:visible")).toBeVisible();
   });
 });

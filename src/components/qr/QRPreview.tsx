@@ -79,15 +79,16 @@ export function QRPreview({ encodedValue, status, design }: QRPreviewProps) {
             <ErrorState title={t.preview.invalid} />
           </div>
         )}
+
+        {/* Kept mounted at all times, like the real QR container above, so its
+            instance always has a live DOM node to attach to. */}
+        <div ref={ghostContainerRef} className={cn("absolute opacity-60", !showGhost && "invisible")} aria-hidden="true" />
         {showGhost && (
-          <>
-            <div ref={ghostContainerRef} className="absolute opacity-60" aria-hidden="true" />
-            <div className="absolute inset-0 flex items-center justify-center p-6">
-              <p className="rounded-md bg-white/85 px-4 py-2 text-center text-sm font-medium text-cinza-antracite shadow-sm">
-                {t.preview.empty}
-              </p>
-            </div>
-          </>
+          <div className="absolute inset-0 flex items-center justify-center p-6">
+            <p className="rounded-md bg-white/85 px-4 py-2 text-center text-sm font-medium text-cinza-antracite shadow-sm">
+              {t.preview.empty}
+            </p>
+          </div>
         )}
         {showQr && !ready && (
           <div className="absolute inset-0 flex items-center justify-center">
