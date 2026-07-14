@@ -7,7 +7,6 @@ import { hasSufficientContrast } from "@/lib/qr/contrast";
 import { useQrCodeInstance } from "./useQrCodeInstance";
 import { useDebouncedValue } from "@/lib/utils/useDebouncedValue";
 import { useTranslations } from "@/i18n/I18nProvider";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { cn } from "@/lib/utils/cn";
@@ -20,6 +19,8 @@ interface QRPreviewProps {
 
 const PREVIEW_SIZE = 280;
 const PRINT_TEST_SIZE_MM = 30;
+const GHOST_DATA = "https://caetano.pt";
+const GHOST_FOREGROUND = "#D7DFE3";
 
 export function QRPreview({ encodedValue, status, design }: QRPreviewProps) {
   const t = useTranslations();
@@ -35,6 +36,25 @@ export function QRPreview({ encodedValue, status, design }: QRPreviewProps) {
   const { containerRef, ready } = useQrCodeInstance(options);
   const contrastOk = hasSufficientContrast(design.foregroundColor, design.backgroundColor);
   const showQr = status === "valid" && Boolean(encodedValue);
+  const showGhost = status === "empty";
+
+  const ghostOptions = useMemo(() => {
+    if (!showGhost) return null;
+    return buildQrCodeStylingOptions(
+      GHOST_DATA,
+      {
+        ...design,
+        foregroundColor: GHOST_FOREGROUND,
+        backgroundColor: "#FFFFFF",
+        gradient: { ...design.gradient, enabled: false },
+        logo: null,
+      },
+      PREVIEW_SIZE,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showGhost, design.moduleStyle, design.cornerStyle, design.cornerDotStyle, design.margin]);
+
+  const { containerRef: ghostContainerRef } = useQrCodeInstance(ghostOptions);
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -59,10 +79,15 @@ export function QRPreview({ encodedValue, status, design }: QRPreviewProps) {
             <ErrorState title={t.preview.invalid} />
           </div>
         )}
-        {status === "empty" && (
-          <div className="absolute inset-0 flex items-center justify-center p-2">
-            <EmptyState title={t.preview.empty} />
-          </div>
+        {showGhost && (
+          <>
+            <div ref={ghostContainerRef} className="absolute opacity-60" aria-hidden="true" />
+            <div className="absolute inset-0 flex items-center justify-center p-6">
+              <p className="rounded-md bg-white/85 px-4 py-2 text-center text-sm font-medium text-cinza-antracite shadow-sm">
+                {t.preview.empty}
+              </p>
+            </div>
+          </>
         )}
         {showQr && !ready && (
           <div className="absolute inset-0 flex items-center justify-center">

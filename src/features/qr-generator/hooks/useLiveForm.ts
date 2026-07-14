@@ -41,15 +41,19 @@ export function useLiveForm<TValues extends FieldValues>({
   const isDirty = formState.isDirty;
 
   useEffect(() => {
-    onDraftChange?.(values);
     const parsed = schema.safeParse(values);
     if (parsed.success) {
       onValidChange(parsed.data);
-    } else if (isDirty || startDirty) {
-      // Only report invalid once the user has actually touched the form (or
-      // it started pre-filled from a restored draft) — a pristine, still-empty
-      // form isn't an error, it just hasn't started.
-      onInvalid?.();
+    }
+    if (isDirty || startDirty) {
+      // Only persist a draft (and report invalid content) once the user has
+      // actually touched the form, or it started pre-filled from a restored
+      // draft — a pristine, still-blank form isn't an error and shouldn't
+      // overwrite the saved draft with blank values.
+      onDraftChange?.(values);
+      if (!parsed.success) {
+        onInvalid?.();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(values), isValid, isDirty, startDirty]);

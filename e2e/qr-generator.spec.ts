@@ -58,4 +58,13 @@ test.describe("Gerador de QR Code", () => {
     await page.getByRole("radio", { name: /^Texto/ }).click();
     await expect(page.getByLabel("Texto")).toHaveValue("Conteúdo temporário");
   });
+
+  test("mostra o estado vazio (não erro) ao trocar para um tipo nunca preenchido", async ({ page }) => {
+    await page.goto("/");
+    for (const type of ["Texto", "E-mail", "Telefone", "SMS", "WhatsApp", "Wi-Fi", "Contacto", "Evento"]) {
+      await page.getByRole("radio", { name: new RegExp(`^${type}`) }).click();
+      await expect(page.getByText("Corrija os erros no formulário")).not.toBeVisible();
+      await expect(page.getByText("Preencha o formulário para gerar o seu QR Code")).toBeVisible();
+    }
+  });
 });
