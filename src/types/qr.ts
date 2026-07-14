@@ -1,3 +1,5 @@
+import { CAETANO_LOGO_DATA_URI, CAETANO_LOGO_FILE_NAME } from "@/lib/qr/defaultLogo";
+
 export type QRCodeType =
   | "url"
   | "text"
@@ -72,9 +74,15 @@ export const DEFAULT_DESIGN: QRCodeDesign = {
   moduleStyle: "rounded",
   cornerStyle: "rounded",
   cornerDotStyle: "dot",
-  errorCorrectionLevel: "M",
+  errorCorrectionLevel: "H",
   margin: 16,
-  logo: null,
+  logo: {
+    source: CAETANO_LOGO_DATA_URI,
+    size: 0.3,
+    margin: 4,
+    backgroundEnabled: false,
+    fileName: CAETANO_LOGO_FILE_NAME,
+  },
 };
 
 export interface QRCodeProject<TPayload = Record<string, unknown>> {
