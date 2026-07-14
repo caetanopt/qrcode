@@ -11,20 +11,25 @@ import { Button } from "@/components/ui/Button";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface WifiFormProps {
+  initialValues?: Partial<WifiPayload>;
   onValidChange: (payload: WifiPayload) => void;
   onInvalid: () => void;
+  /** Never receives the password — Wi-Fi passwords are never kept when switching QR type. */
+  onDraftChange: (payload: Partial<Omit<WifiPayload, "password">>) => void;
 }
 
 const SECURITY_VALUES: WifiPayload["security"][] = ["WPA2", "WPA3", "WPA", "WEP", "nopass"];
 
-export function WifiForm({ onValidChange, onInvalid }: WifiFormProps) {
+export function WifiForm({ initialValues, onValidChange, onInvalid, onDraftChange }: WifiFormProps) {
   const t = useTranslations();
   const [showPassword, setShowPassword] = useState(false);
   const { register, watch, setValue, formState } = useLiveForm<WifiPayload>({
     schema: wifiSchema,
-    defaultValues: { ssid: "", password: "", security: "WPA2", hidden: false },
+    defaultValues: { ssid: "", password: "", security: "WPA2", hidden: false, ...initialValues },
     onValidChange,
     onInvalid,
+    onDraftChange: ({ password: _password, ...rest }) => onDraftChange(rest),
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   const security = watch("security");

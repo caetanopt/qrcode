@@ -42,4 +42,20 @@ test.describe("Gerador de QR Code", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "Escolha o tipo de QR Code" })).toBeVisible();
   });
+
+  test("mantém o conteúdo de cada tipo ao trocar e voltar", async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("URL de destino").fill("https://caetano.pt/nissan/");
+    await page.getByLabel("Título interno").fill("Campanha Nissan");
+
+    await page.getByRole("radio", { name: /^Texto/ }).click();
+    await page.getByLabel("Texto").fill("Conteúdo temporário");
+
+    await page.getByRole("radio", { name: /^URL/ }).click();
+    await expect(page.getByLabel("URL de destino")).toHaveValue("https://caetano.pt/nissan/");
+    await expect(page.getByLabel("Título interno")).toHaveValue("Campanha Nissan");
+
+    await page.getByRole("radio", { name: /^Texto/ }).click();
+    await expect(page.getByLabel("Texto")).toHaveValue("Conteúdo temporário");
+  });
 });

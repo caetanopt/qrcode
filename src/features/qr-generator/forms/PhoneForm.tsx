@@ -7,17 +7,21 @@ import { Input } from "@/components/ui/Input";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface PhoneFormProps {
+  initialValues?: Partial<PhonePayload>;
   onValidChange: (payload: PhonePayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<PhonePayload>) => void;
 }
 
-export function PhoneForm({ onValidChange, onInvalid }: PhoneFormProps) {
+export function PhoneForm({ initialValues, onValidChange, onInvalid, onDraftChange }: PhoneFormProps) {
   const t = useTranslations();
   const { register, formState } = useLiveForm<PhonePayload>({
     schema: phoneSchema,
-    defaultValues: { phone: "" },
+    defaultValues: { phone: "", ...initialValues },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (

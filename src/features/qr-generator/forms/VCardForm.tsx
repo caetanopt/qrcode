@@ -8,11 +8,13 @@ import { Textarea } from "@/components/ui/Textarea";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface VCardFormProps {
+  initialValues?: Partial<VCardPayload>;
   onValidChange: (payload: VCardPayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<VCardPayload>) => void;
 }
 
-export function VCardForm({ onValidChange, onInvalid }: VCardFormProps) {
+export function VCardForm({ initialValues, onValidChange, onInvalid, onDraftChange }: VCardFormProps) {
   const t = useTranslations();
   const { register, formState } = useLiveForm<VCardPayload>({
     schema: vcardSchema,
@@ -26,9 +28,12 @@ export function VCardForm({ onValidChange, onInvalid }: VCardFormProps) {
       website: "",
       address: "",
       notes: "",
+      ...initialValues,
     },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (

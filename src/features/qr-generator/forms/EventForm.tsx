@@ -8,11 +8,13 @@ import { Textarea } from "@/components/ui/Textarea";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface EventFormProps {
+  initialValues?: Partial<EventPayload>;
   onValidChange: (payload: EventPayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<EventPayload>) => void;
 }
 
-export function EventForm({ onValidChange, onInvalid }: EventFormProps) {
+export function EventForm({ initialValues, onValidChange, onInvalid, onDraftChange }: EventFormProps) {
   const t = useTranslations();
   const { register, formState } = useLiveForm<EventPayload>({
     schema: eventSchema,
@@ -23,9 +25,12 @@ export function EventForm({ onValidChange, onInvalid }: EventFormProps) {
       end: "",
       description: "",
       timezone: "Europe/Lisbon",
+      ...initialValues,
     },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   const endError = formState.errors.end

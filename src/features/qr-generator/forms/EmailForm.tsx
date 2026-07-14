@@ -8,17 +8,21 @@ import { Textarea } from "@/components/ui/Textarea";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface EmailFormProps {
+  initialValues?: Partial<EmailPayload>;
   onValidChange: (payload: EmailPayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<EmailPayload>) => void;
 }
 
-export function EmailForm({ onValidChange, onInvalid }: EmailFormProps) {
+export function EmailForm({ initialValues, onValidChange, onInvalid, onDraftChange }: EmailFormProps) {
   const t = useTranslations();
   const { register, formState } = useLiveForm<EmailPayload>({
     schema: emailSchema,
-    defaultValues: { address: "", subject: "", body: "" },
+    defaultValues: { address: "", subject: "", body: "", ...initialValues },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (

@@ -10,6 +10,15 @@ interface UseLiveFormArgs<TValues extends FieldValues> {
   defaultValues: DefaultValues<TValues>;
   onValidChange: (value: TValues) => void;
   onInvalid?: () => void;
+  /** Fired on every keystroke, valid or not, so the draft can be kept when switching QR type. */
+  onDraftChange?: (value: TValues) => void;
+  /**
+   * Treat the form as already touched from the first render — used when
+   * `defaultValues` were restored from a saved draft, so invalid restored
+   * content is reported immediately instead of being mistaken for a
+   * pristine, untouched form.
+   */
+  startDirty?: boolean;
 }
 
 export function useLiveForm<TValues extends FieldValues>({
@@ -17,6 +26,8 @@ export function useLiveForm<TValues extends FieldValues>({
   defaultValues,
   onValidChange,
   onInvalid,
+  onDraftChange,
+  startDirty = false,
 }: UseLiveFormArgs<TValues>) {
   const form = useForm<TValues>({
     resolver: zodResolver(schema),
@@ -30,16 +41,18 @@ export function useLiveForm<TValues extends FieldValues>({
   const isDirty = formState.isDirty;
 
   useEffect(() => {
+    onDraftChange?.(values);
     const parsed = schema.safeParse(values);
     if (parsed.success) {
       onValidChange(parsed.data);
-    } else if (isDirty) {
-      // Only report invalid once the user has actually touched the form —
-      // a pristine, still-empty form isn't an error, it just hasn't started.
+    } else if (isDirty || startDirty) {
+      // Only report invalid once the user has actually touched the form (or
+      // it started pre-filled from a restored draft) — a pristine, still-empty
+      // form isn't an error, it just hasn't started.
       onInvalid?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(values), isValid, isDirty]);
+  }, [JSON.stringify(values), isValid, isDirty, startDirty]);
 
   return form;
 }

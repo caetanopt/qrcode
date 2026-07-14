@@ -8,17 +8,21 @@ import { Textarea } from "@/components/ui/Textarea";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface SmsFormProps {
+  initialValues?: Partial<SmsPayload>;
   onValidChange: (payload: SmsPayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<SmsPayload>) => void;
 }
 
-export function SmsForm({ onValidChange, onInvalid }: SmsFormProps) {
+export function SmsForm({ initialValues, onValidChange, onInvalid, onDraftChange }: SmsFormProps) {
   const t = useTranslations();
   const { register, formState } = useLiveForm<SmsPayload>({
     schema: smsSchema,
-    defaultValues: { phone: "", message: "" },
+    defaultValues: { phone: "", message: "", ...initialValues },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (

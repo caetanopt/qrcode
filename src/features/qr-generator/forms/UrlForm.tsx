@@ -7,17 +7,21 @@ import { Input } from "@/components/ui/Input";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface UrlFormProps {
+  initialValues?: Partial<UrlPayload>;
   onValidChange: (payload: UrlPayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<UrlPayload>) => void;
 }
 
-export function UrlForm({ onValidChange, onInvalid }: UrlFormProps) {
+export function UrlForm({ initialValues, onValidChange, onInvalid, onDraftChange }: UrlFormProps) {
   const t = useTranslations();
   const { register, formState } = useLiveForm<UrlPayload>({
     schema: urlSchema,
-    defaultValues: { url: "", title: "" },
+    defaultValues: { url: "", title: "", ...initialValues },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (

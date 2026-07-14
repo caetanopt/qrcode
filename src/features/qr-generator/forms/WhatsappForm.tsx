@@ -8,17 +8,21 @@ import { Textarea } from "@/components/ui/Textarea";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface WhatsappFormProps {
+  initialValues?: Partial<WhatsappPayload>;
   onValidChange: (payload: WhatsappPayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<WhatsappPayload>) => void;
 }
 
-export function WhatsappForm({ onValidChange, onInvalid }: WhatsappFormProps) {
+export function WhatsappForm({ initialValues, onValidChange, onInvalid, onDraftChange }: WhatsappFormProps) {
   const t = useTranslations();
   const { register, formState } = useLiveForm<WhatsappPayload>({
     schema: whatsappSchema,
-    defaultValues: { countryCode: "+351", phone: "", message: "" },
+    defaultValues: { countryCode: "+351", phone: "", message: "", ...initialValues },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (

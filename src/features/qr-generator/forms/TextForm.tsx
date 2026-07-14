@@ -8,19 +8,23 @@ import { formatMessage } from "@/i18n/index";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface TextFormProps {
+  initialValues?: Partial<TextPayload>;
   onValidChange: (payload: TextPayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<TextPayload>) => void;
 }
 
 const MAX_LENGTH = 2000;
 
-export function TextForm({ onValidChange, onInvalid }: TextFormProps) {
+export function TextForm({ initialValues, onValidChange, onInvalid, onDraftChange }: TextFormProps) {
   const t = useTranslations();
   const { register, watch, formState } = useLiveForm<TextPayload>({
     schema: textSchema,
-    defaultValues: { content: "" },
+    defaultValues: { content: "", ...initialValues },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
   const content = watch("content") ?? "";
 

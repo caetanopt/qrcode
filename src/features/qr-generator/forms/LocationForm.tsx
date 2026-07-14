@@ -7,17 +7,21 @@ import { Input } from "@/components/ui/Input";
 import { useTranslations } from "@/i18n/I18nProvider";
 
 interface LocationFormProps {
+  initialValues?: Partial<LocationPayload>;
   onValidChange: (payload: LocationPayload) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Partial<LocationPayload>) => void;
 }
 
-export function LocationForm({ onValidChange, onInvalid }: LocationFormProps) {
+export function LocationForm({ initialValues, onValidChange, onInvalid, onDraftChange }: LocationFormProps) {
   const t = useTranslations();
   const { register, formState } = useLiveForm<LocationPayload>({
     schema: locationSchema,
-    defaultValues: { latitude: 0, longitude: 0, description: "" },
+    defaultValues: { latitude: 0, longitude: 0, description: "", ...initialValues },
     onValidChange,
     onInvalid,
+    onDraftChange,
+    startDirty: Boolean(initialValues && Object.keys(initialValues).length > 0),
   });
 
   return (

@@ -14,32 +14,104 @@ import { EventForm } from "../forms/EventForm";
 
 interface ContentFormProps {
   type: QRCodeType;
+  initialValues: Record<string, unknown> | undefined;
   onValidChange: (payload: Record<string, unknown>) => void;
   onInvalid: () => void;
+  onDraftChange: (payload: Record<string, unknown>) => void;
 }
 
-export function ContentForm({ type, onValidChange, onInvalid }: ContentFormProps) {
+export function ContentForm({ type, initialValues, onValidChange, onInvalid, onDraftChange }: ContentFormProps) {
   switch (type) {
     case "url":
-      return <UrlForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <UrlForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "text":
-      return <TextForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <TextForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "email":
-      return <EmailForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <EmailForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "phone":
-      return <PhoneForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <PhoneForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "sms":
-      return <SmsForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <SmsForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "whatsapp":
-      return <WhatsappForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <WhatsappForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "wifi":
-      return <WifiForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <WifiForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "vcard":
-      return <VCardForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <VCardForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "location":
-      return <LocationForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <LocationForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     case "event":
-      return <EventForm onValidChange={onValidChange} onInvalid={onInvalid} />;
+      return (
+        <EventForm
+          initialValues={initialValues}
+          onValidChange={onValidChange}
+          onInvalid={onInvalid}
+          onDraftChange={onDraftChange}
+        />
+      );
     default:
       return null;
   }

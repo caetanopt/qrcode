@@ -19,6 +19,7 @@ export function QrGeneratorApp() {
   const [design, setDesign, resetDesign] = useLocalStorageState("caetano-qr:design", DEFAULT_DESIGN);
   const [encodedValue, setEncodedValue] = useState<string | null>(null);
   const [contentStatus, setContentStatus] = useState<"empty" | "invalid" | "valid">("empty");
+  const [drafts, setDrafts] = useState<Partial<Record<QRCodeType, Record<string, unknown>>>>({});
 
   const handleValidChange = useCallback(
     (payload: Record<string, unknown>) => {
@@ -41,6 +42,13 @@ export function QrGeneratorApp() {
     setContentStatus("invalid");
   }, []);
 
+  const handleDraftChange = useCallback(
+    (payload: Record<string, unknown>) => {
+      setDrafts((current) => ({ ...current, [type]: payload }));
+    },
+    [type],
+  );
+
   function handleTypeChange(nextType: QRCodeType) {
     setType(nextType);
     setEncodedValue(null);
@@ -61,7 +69,14 @@ export function QrGeneratorApp() {
           <h2 id="content-heading" className="mb-4 text-lg font-semibold text-cinza-antracite">
             {t.form.contentTitle}
           </h2>
-          <ContentForm key={type} type={type} onValidChange={handleValidChange} onInvalid={handleInvalid} />
+          <ContentForm
+            key={type}
+            type={type}
+            initialValues={drafts[type]}
+            onValidChange={handleValidChange}
+            onInvalid={handleInvalid}
+            onDraftChange={handleDraftChange}
+          />
         </section>
 
         <section aria-labelledby="design-heading" className="rounded-lg border border-cinza-medio-100 p-4 sm:p-6">
