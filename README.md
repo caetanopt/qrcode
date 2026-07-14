@@ -76,11 +76,9 @@ e2e/                     # testes Playwright
   nesta versão para evitar introduzir uma dependência de API externa (e gestão
   de chaves) sem uma decisão de produto explícita sobre o fornecedor.
 - **Logótipo da marca Caetano:** o wordmark é um desenho manual proprietário
-  (não deriva de nenhuma tipografia) e o manual de identidade indica
-  explicitamente que não deve ser recriado — apenas o ficheiro oficial deve ser
-  usado. Por isso, o cabeçalho usa o texto "caetano" estilizado (cor
-  `azul-cyan`) em vez de recriar o desenho do logótipo; o ficheiro oficial pode
-  ser adicionado depois em `src/components/layout/Header.tsx`.
+  (não deriva de nenhuma tipografia). O cabeçalho usa o ficheiro SVG oficial
+  fornecido (`src/components/layout/CaetanoLogo.tsx`), conforme indicado no
+  manual de identidade — não é recriado a partir de tipografia.
 - **QR Codes dinâmicos, autenticação, analytics e pagamentos** ficam fora deste
   MVP, conforme o âmbito definido, mas o modelo de dados (`QRCodeProject`) foi
   desenhado para acomodar essa evolução sem reescrita.
