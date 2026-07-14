@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { QRCodeDesign } from "@/types/qr";
 import { buildQrCodeStylingOptions } from "@/lib/qr/qrCodeStylingOptions";
-import { hasSufficientContrast } from "@/lib/qr/contrast";
+import { designHasSufficientContrast } from "@/lib/qr/contrast";
 import { useQrCodeInstance } from "./useQrCodeInstance";
 import { useDebouncedValue } from "@/lib/utils/useDebouncedValue";
 import { useTranslations } from "@/i18n/I18nProvider";
@@ -34,7 +34,7 @@ export function QRPreview({ encodedValue, status, design }: QRPreviewProps) {
   }, [debouncedValue, debouncedDesign, printTest]);
 
   const { containerRef, ready } = useQrCodeInstance(options);
-  const contrastOk = hasSufficientContrast(design.foregroundColor, design.backgroundColor);
+  const contrastOk = designHasSufficientContrast(design);
   const showQr = status === "valid" && Boolean(encodedValue);
   const showGhost = status === "empty";
 

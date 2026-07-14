@@ -61,21 +61,33 @@ test.describe("Gerador de QR Code", () => {
 
   test("mostra o estado vazio (não erro) ao trocar para um tipo nunca preenchido", async ({ page }) => {
     await page.goto("/");
-    for (const type of ["Texto", "E-mail", "Telefone", "SMS", "WhatsApp", "Wi-Fi", "Contacto", "Evento"]) {
+    for (const type of ["Texto", "E-mail", "Telefone", "SMS", "WhatsApp", "Wi-Fi", "Contacto", "Localização", "Evento"]) {
       await page.getByRole("radio", { name: new RegExp(`^${type}`) }).click();
       await expect(page.getByText("Corrija os erros no formulário")).not.toBeVisible();
       await expect(page.getByText("Preencha o formulário para gerar o seu QR Code")).toBeVisible();
     }
   });
 
-  test("mantém o QR fantasma visível ao voltar de um tipo sempre válido", async ({ page }) => {
+  test("mantém o QR fantasma visível ao voltar de um tipo com conteúdo válido", async ({ page }) => {
     await page.goto("/");
-    // Localização começa preenchida com coordenadas 0,0 válidas por defeito.
     await page.getByRole("radio", { name: /^Localização/ }).click();
+    await page.getByLabel("Latitude").fill("41.15");
+    await page.getByLabel("Longitude").fill("-8.61");
     await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas:visible")).toBeVisible();
 
     await page.getByRole("radio", { name: /^URL/ }).click();
     await expect(page.getByText("Preencha o formulário para gerar o seu QR Code")).toBeVisible();
+    await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas:visible")).toBeVisible();
+  });
+
+  test("exige palavra-passe em redes Wi-Fi protegidas", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("radio", { name: /Wi-Fi/ }).click();
+    await page.getByLabel("Nome da rede (SSID)").fill("Rede Caetano");
+    await expect(page.getByText("Introduza a palavra-passe da rede")).toBeVisible();
+    await expect(page.getByText("Corrija os erros no formulário")).toBeVisible();
+
+    await page.getByRole("textbox", { name: "Palavra-passe" }).fill("segredo123");
     await expect(page.getByRole("img", { name: "Pré-visualização do QR Code gerado" }).locator("canvas:visible")).toBeVisible();
   });
 });

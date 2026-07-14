@@ -1,5 +1,6 @@
 "use client";
 
+import type { DefaultValues } from "react-hook-form";
 import { locationSchema, type LocationPayload } from "@/lib/validation/schemas";
 import { useLiveForm } from "../hooks/useLiveForm";
 import { FormField } from "@/components/ui/FormField";
@@ -17,7 +18,15 @@ export function LocationForm({ initialValues, onValidChange, onInvalid, onDraftC
   const t = useTranslations();
   const { register, formState } = useLiveForm<LocationPayload>({
     schema: locationSchema,
-    defaultValues: { latitude: 0, longitude: 0, description: "", ...initialValues },
+    // Coordinates start blank on purpose (never a silent 0,0). The inputs
+    // yield strings at runtime and the schema coerces them, so "" is the
+    // honest default even though the payload type says number.
+    defaultValues: {
+      latitude: "",
+      longitude: "",
+      description: "",
+      ...initialValues,
+    } as unknown as DefaultValues<LocationPayload>,
     onValidChange,
     onInvalid,
     onDraftChange,

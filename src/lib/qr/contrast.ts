@@ -39,3 +39,24 @@ export const MIN_QR_CONTRAST_RATIO = 2.5;
 export function hasSufficientContrast(foreground: string, background: string): boolean {
   return contrastRatio(foreground, background) >= MIN_QR_CONTRAST_RATIO;
 }
+
+interface ContrastCheckableDesign {
+  foregroundColor: string;
+  backgroundColor: string;
+  gradient: { enabled: boolean; startColor: string; endColor: string };
+}
+
+/**
+ * When a gradient is active the modules are painted with the gradient stops,
+ * not with foregroundColor — so both stops must clear the threshold or part
+ * of the code can fade into the background.
+ */
+export function designHasSufficientContrast(design: ContrastCheckableDesign): boolean {
+  if (design.gradient.enabled) {
+    return (
+      hasSufficientContrast(design.gradient.startColor, design.backgroundColor) &&
+      hasSufficientContrast(design.gradient.endColor, design.backgroundColor)
+    );
+  }
+  return hasSufficientContrast(design.foregroundColor, design.backgroundColor);
+}

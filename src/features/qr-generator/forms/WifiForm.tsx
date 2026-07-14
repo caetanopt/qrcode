@@ -43,7 +43,9 @@ export function WifiForm({ initialValues, onValidChange, onInvalid, onDraftChang
             id={inputId}
             aria-describedby={describedBy}
             invalid={Boolean(formState.errors.ssid)}
-            {...register("ssid")}
+            // deps: the password error comes from a whole-schema rule, so it
+            // must be re-evaluated when the sibling fields change too.
+            {...register("ssid", { deps: ["password"] })}
           />
         )}
       </FormField>
@@ -57,16 +59,26 @@ export function WifiForm({ initialValues, onValidChange, onInvalid, onDraftChang
               label: value === "nopass" ? "Sem palavra-passe" : value,
             }))}
             value={security}
-            {...register("security")}
+            {...register("security", { deps: ["password"] })}
           />
         )}
       </FormField>
 
       {security !== "nopass" && (
-        <FormField label={t.form.wifi.password}>
-          {({ inputId }) => (
+        <FormField
+          label={t.form.wifi.password}
+          required
+          error={formState.errors.password && t.form.wifi.passwordRequired}
+        >
+          {({ inputId, describedBy }) => (
             <div className="flex gap-2">
-              <Input id={inputId} type={showPassword ? "text" : "password"} {...register("password")} />
+              <Input
+                id={inputId}
+                type={showPassword ? "text" : "password"}
+                aria-describedby={describedBy}
+                invalid={Boolean(formState.errors.password)}
+                {...register("password")}
+              />
               <Button
                 type="button"
                 variant="secondary"

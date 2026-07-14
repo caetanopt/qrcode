@@ -33,7 +33,7 @@ describe("emailSchema", () => {
 
 describe("wifiSchema", () => {
   it("defaults security to WPA2", () => {
-    const result = wifiSchema.safeParse({ ssid: "Rede" });
+    const result = wifiSchema.safeParse({ ssid: "Rede", password: "segredo123" });
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.security).toBe("WPA2");
@@ -41,7 +41,15 @@ describe("wifiSchema", () => {
   });
 
   it("rejects a missing ssid", () => {
-    expect(wifiSchema.safeParse({ ssid: "" }).success).toBe(false);
+    expect(wifiSchema.safeParse({ ssid: "", password: "segredo123" }).success).toBe(false);
+  });
+
+  it("rejects an empty password on a protected network", () => {
+    expect(wifiSchema.safeParse({ ssid: "Rede", security: "WPA2", password: "" }).success).toBe(false);
+  });
+
+  it("accepts an empty password on an open network", () => {
+    expect(wifiSchema.safeParse({ ssid: "Rede", security: "nopass", password: "" }).success).toBe(true);
   });
 });
 
@@ -56,6 +64,18 @@ describe("locationSchema", () => {
 
   it("accepts valid coordinates", () => {
     expect(locationSchema.safeParse({ latitude: 41.15, longitude: -8.6 }).success).toBe(true);
+  });
+
+  it("rejects blank coordinates instead of coercing them to 0,0", () => {
+    expect(locationSchema.safeParse({ latitude: "", longitude: "" }).success).toBe(false);
+  });
+
+  it("still coerces numeric strings from form inputs", () => {
+    const result = locationSchema.safeParse({ latitude: "41.15", longitude: "-8.6" });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.latitude).toBeCloseTo(41.15);
+    }
   });
 });
 

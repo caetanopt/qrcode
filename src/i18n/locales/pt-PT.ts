@@ -84,6 +84,7 @@ const ptPT = {
       hidden: "Rede oculta",
       showPassword: "Mostrar palavra-passe",
       error: "Introduza o nome da rede",
+      passwordRequired: "Introduza a palavra-passe da rede",
     },
     vcard: {
       firstName: "Nome",

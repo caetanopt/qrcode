@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { CornerStyle, ModuleStyle, QRCodeDesign } from "@/types/qr";
 import { DEFAULT_DESIGN } from "@/types/qr";
-import { hasSufficientContrast } from "@/lib/qr/contrast";
+import { designHasSufficientContrast } from "@/lib/qr/contrast";
 import { ERROR_CORRECTION_LEVELS, recommendErrorCorrectionLevel } from "@/lib/qr/errorCorrection";
 import { MAX_LOGO_FILE_SIZE_BYTES, validateLogoFile } from "@/lib/security/fileValidation";
 import { sanitizeSvgFile } from "@/lib/security/sanitizeSvg";
@@ -36,7 +36,7 @@ export function DesignPanel({ design, onChange }: DesignPanelProps) {
   const t = useTranslations();
   const { showToast } = useToast();
   const [logoLoading, setLogoLoading] = useState(false);
-  const contrastOk = hasSufficientContrast(design.foregroundColor, design.backgroundColor);
+  const contrastOk = designHasSufficientContrast(design);
 
   function update(partial: Partial<QRCodeDesign>) {
     onChange({ ...design, ...partial });

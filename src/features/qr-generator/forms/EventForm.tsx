@@ -62,7 +62,9 @@ export function EventForm({ initialValues, onValidChange, onInvalid, onDraftChan
               type="datetime-local"
               aria-describedby={describedBy}
               invalid={Boolean(formState.errors.start)}
-              {...register("start")}
+              // deps: "end before start" lives on the end field, so changing
+              // the start date must re-evaluate it too.
+              {...register("start", { deps: ["end"] })}
             />
           )}
         </FormField>

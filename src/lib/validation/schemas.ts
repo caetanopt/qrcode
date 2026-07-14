@@ -77,12 +77,20 @@ export const whatsappSchema = z.object({
 });
 export type WhatsappPayload = z.infer<typeof whatsappSchema>;
 
-export const wifiSchema = z.object({
-  ssid: z.string().trim().min(1).max(64),
-  password: z.string().max(64).optional().default(""),
-  security: z.enum(["WPA", "WPA2", "WPA3", "WEP", "nopass"]).default("WPA2"),
-  hidden: z.boolean().default(false),
-});
+export const wifiSchema = z
+  .object({
+    ssid: z.string().trim().min(1).max(64),
+    password: z.string().max(64).optional().default(""),
+    security: z.enum(["WPA", "WPA2", "WPA3", "WEP", "nopass"]).default("WPA2"),
+    hidden: z.boolean().default(false),
+  })
+  .superRefine((data, ctx) => {
+    // A protected network with an empty password would produce a QR code that
+    // scans fine but can never join the network.
+    if (data.security !== "nopass" && data.password.length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "passwordRequired", path: ["password"] });
+    }
+  });
 export type WifiPayload = z.infer<typeof wifiSchema>;
 
 export const vcardSchema = z.object({
@@ -98,9 +106,16 @@ export const vcardSchema = z.object({
 });
 export type VCardPayload = z.infer<typeof vcardSchema>;
 
+// Blank input must be rejected, not silently coerced to 0 (coordinates 0,0).
+const coordinate = (min: number, max: number) =>
+  z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.coerce.number().min(min).max(max),
+  );
+
 export const locationSchema = z.object({
-  latitude: z.coerce.number().min(-90).max(90),
-  longitude: z.coerce.number().min(-180).max(180),
+  latitude: coordinate(-90, 90),
+  longitude: coordinate(-180, 180),
   description: z.string().trim().max(200).optional().default(""),
 });
 export type LocationPayload = z.infer<typeof locationSchema>;

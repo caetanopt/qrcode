@@ -35,6 +35,10 @@ export function DownloadOptions({ encodedValue, design }: DownloadOptionsProps) 
 
   const disabled = !encodedValue;
 
+  // Guard against a cleared or out-of-range custom size (e.g. an empty input
+  // becomes 0), which would otherwise render a blank or gigantic file.
+  const exportSize = Math.min(4096, Math.max(64, Number.isFinite(sizeValue) ? sizeValue : 512));
+
   async function handleDownload() {
     if (!encodedValue) return;
     setIsDownloading(true);
@@ -42,7 +46,7 @@ export function DownloadOptions({ encodedValue, design }: DownloadOptionsProps) 
       const { default: QRCodeStyling } = await import("qr-code-styling");
       const effectiveDesign: QRCodeDesign =
         transparent && format !== "jpeg" ? { ...design, backgroundColor: "transparent" } : design;
-      const options = buildQrCodeStylingOptions(encodedValue, effectiveDesign, sizeValue);
+      const options = buildQrCodeStylingOptions(encodedValue, effectiveDesign, exportSize);
       const instance = new QRCodeStyling(options);
       await instance.download({ name: fileName || "qrcode-caetano", extension: format });
       showToast(t.download.success, "success");
@@ -57,7 +61,7 @@ export function DownloadOptions({ encodedValue, design }: DownloadOptionsProps) 
     if (!encodedValue) return;
     try {
       const { default: QRCodeStyling } = await import("qr-code-styling");
-      const options = buildQrCodeStylingOptions(encodedValue, design, sizeValue);
+      const options = buildQrCodeStylingOptions(encodedValue, design, exportSize);
       const instance = new QRCodeStyling(options);
       const blob = await instance.getRawData("png");
       if (blob instanceof Blob && "clipboard" in navigator && "write" in navigator.clipboard) {
