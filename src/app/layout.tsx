@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   description:
     "Crie, personalize e descarregue QR Codes profissionais para marketing, eventos, restauração e comunicação empresarial.",
   alternates: { canonical: "/" },
+  robots: { index: false, follow: false },
   openGraph: {
     type: "website",
     locale: "pt_PT",
